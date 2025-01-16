@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOMOS Ai Chat</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- شاشة إدخال اسم المستخدم -->
+  <div id="nameInputContainer">
+    <h2>مرحبًا بك في HOMOS Ai</h2>
+    <p>يرجى إدخال اسمك للبدء</p>
+    <input type="text" id="username" placeholder="أدخل اسمك">
+    <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني">
+    <button id="startChat">ابدأ</button>
+    <p class="notice">ملحوظة: هذه المحادثة محدودة ونرحب بملاحظاتك عبر الدعم.</p>
+    <a href="#privacyPolicy" id="privacyPolicyLink">سياسة الخصوصية</a> | <a href="#termsOfUse" id="termsOfUseLink">شروط الاستخدام</a>
+  </div>
+
+  <!-- سياسة الخصوصية -->
+  <div id="privacyPolicy" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closePrivacyPolicy">&times;</span>
+      <h2>سياسة الخصوصية</h2>
+      <p>نحن نحترم خصوصيتك ونعمل على حماية معلوماتك الشخصية. يرجى قراءة سياسة الخصوصية بعناية لمعرفة كيفية جمع واستخدام وحماية بياناتك.</p>
+      <p>بياناتك الشخصية مثل الاسم والبريد الإلكتروني تُستخدم فقط لتحسين تجربتك معنا. لن نقوم بمشاركة بياناتك مع أي طرف ثالث دون إذن مسبق منك.</p>
+    </div>
+  </div>
+
+  <!-- شروط الاستخدام -->
+  <div id="termsOfUse" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeTermsOfUse">&times;</span>
+      <h2>شروط الاستخدام</h2>
+      <p>باستخدام هذا الموقع، توافق على الالتزام بشروط الاستخدام التالية:</p>
+      <ul>
+        <li>يجب أن تكون جميع المعلومات التي تقدمها دقيقة وصحيحة.</li>
+        <li>نحن لا نتحمل مسؤولية أي محتوى غير قانوني أو غير لائق يتم تقديمه عبر المحادثات.</li>
+        <li>أنت توافق على استخدام الموقع في إطار قوانين بلدك وتجنب أي سلوك غير قانوني.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- شاشة المحادثة -->
+  <div id="chatContainer" style="display: none;">
+    <header>
+      <h1>HOMOS Ai</h1>
+      <button id="supportButton">الدعم</button>
+      <button id="themeToggle">🌓</button>
+      <span id="speechToggleEmoji" style="cursor: pointer; font-size: 1.8em;">🔊</span>
+    </header>
+    <div id="chatWindow"></div>
+    <!-- النقاط المتحركة (قبل الإجابة) -->
+    <div id="typingIndicator" style="display: none;">
+      <span>...</span>
+    </div>
+    <footer>
+      <input type="text" id="userInput" placeholder="اكتب رسالتك هنا">
+      <button id="sendMessage" class="sendButton"></button>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
