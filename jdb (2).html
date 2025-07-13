@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ar"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>HOMOS AI Show</title> 
+  <link rel="stylesheet" href="styles.css"> 
+ <style type="text/css" id="dcoder_stylesheet">body {
+  font-family: 'Cairo', sans-serif;
+  background: linear-gradient(to bottom, #101010, #1f1f1f);
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+header img {
+  height: 70px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+.form-container {
+  background-color: #222;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.form-container input,
+.form-container textarea,
+.form-container select,
+.form-container button {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+}
+
+.form-container button {
+  background-color: #00c896;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.form-container button:hover {
+  background-color: #00a37c;
+}</style></head> 
+ <body> 
+  <header> 
+   <img src="logo.png" alt="HOMOS Logo"> 
+   <h2>HOMOS AI Show</h2> 
+  </header> 
+  <main> 
+   <div class="form-container"> 
+    <h3>أنشئ فيديو ذكاء اصطناعي</h3> 
+    <form id="aiForm"> <label>الصورة أو الأفاتار:</label> 
+     <input type="file" name="image" accept="image/*" required> <label>اختر الطريقة:</label> <select name="mode" id="modeSelect"> <option value="text">اكتب جملة</option> <option value="audio">ارفع صوت</option> <option value="record">سجّل صوتك</option> </select> 
+     <div id="textInput"> <label>اكتب الجملة:</label> <textarea name="text" rows="3" placeholder="اكتب الجملة هنا..."></textarea> 
+     </div> 
+     <div id="audioInput" style="display:none;"> <label>ارفع ملف صوتي:</label> 
+      <input type="file" name="audioFile" accept="audio/*"> 
+     </div> 
+     <div id="recordInput" style="display:none;"> <label>سجّل صوتك:</label>
+      <br> <button type="button" id="recordBtn">ابدأ التسجيل</button> 
+      <audio id="recordedAudio" controls style="display:none;"></audio> 
+      <input type="hidden" name="recordedBlob"> 
+     </div> <button type="submit">إنشاء الفيديو</button> 
+    </form> 
+   </div> 
+  </main> 
+  <script src="script.js"></script> 
+ 
+<script type="text/javascript" id="dcoder_script">const modeSelect = document.getElementById('modeSelect');
+const textInput = document.getElementById('textInput');
+const audioInput = document.getElementById('audioInput');
+const recordInput = document.getElementById('recordInput');
+const recordBtn = document.getElementById('recordBtn');
+const recordedAudio = document.getElementById('recordedAudio');
+
+let mediaRecorder;
+let recordedChunks = [];
+
+modeSelect.addEventListener('change', () => {
+  textInput.style.display = 'none';
+  audioInput.style.display = 'none';
+  recordInput.style.display = 'none';
+
+  if (modeSelect.value === 'text') textInput.style.display = 'block';
+  if (modeSelect.value === 'audio') audioInput.style.display = 'block';
+  if (modeSelect.value === 'record') recordInput.style.display = 'block';
+});
+
+recordBtn.addEventListener('click', async () => {
+  recordedChunks = [];
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+    recordedAudio.src = URL.createObjectURL(blob);
+    recordedAudio.style.display = 'block';
+
+    const file = new File([blob], 'recordedAudio.webm', { type: 'audio/webm' });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.name = 'recordedFile';
+    fileInput.files = dataTransfer.files;
+    fileInput.style.display = 'none';
+    document.getElementById('aiForm').appendChild(fileInput);
+  };
+
+  mediaRecorder.start();
+  recordBtn.innerText = 'جاري التسجيل...';
+  setTimeout(() => {
+    mediaRecorder.stop();
+    recordBtn.innerText = 'ابدأ التسجيل';
+  }, 4000);
+});</script></body></html>
