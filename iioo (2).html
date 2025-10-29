@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HOMOS Learn — كورس شامل لتعلّم الألمانية (بدون سيرفر)</title>
+  <link rel="stylesheet" href="style.css">
+<style type="text/css" id="dcoder_stylesheet">:root{
+  --green:#007a3d;
+  --green-dark:#005e2e;
+  --bg:#f5f7f6;
+  --card:#ffffff;
+  --muted:#6b6b6b;
+  --glass:rgba(0,0,0,0.04);
+  --accent:#0b4b28;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0;font-family:"Cairo",sans-serif;background:var(--bg);color:#222}
+.topbar{
+  background:linear-gradient(90deg,var(--green),var(--green-dark));
+  color:white;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{font-size:22px}
+.title{font-weight:700;font-size:18px}
+.right-actions .btn{margin-left:8px}
+
+.layout{display:flex;gap:18px;max-width:1200px;margin:18px auto;padding:0 12px;width:100%}
+.sidebar{flex:0 0 320px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.06);height:calc(100vh - 120px);overflow:auto}
+.content{flex:1;display:flex;flex-direction:column;gap:16px}
+
+.module-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.module-item{padding:8px;border-radius:8px;cursor:pointer;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
+.module-item.active{background:linear-gradient(90deg,#e6f8ef,#d6f7e6);border:1px solid rgba(0,122,61,0.12)}
+
+.lesson-list{list-style:none;padding:0;margin:8px 0;max-height:40vh;overflow:auto}
+.lesson-list li{padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
+.lesson-list li.active{background:linear-gradient(90deg,#f1fff6,#eefef4);border:1px solid rgba(0,0,0,0.04)}
+.lesson-list li .title-small{font-weight:700;color:var(--accent);direction:rtl}
+.lesson-list li .meta{font-size:12px;color:var(--muted)}
+
+.controls{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.btn{border:none;padding:10px;border-radius:10px;cursor:pointer;font-weight:700}
+.btn.green{background:var(--green);color:white}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:#333}
+.btn:hover{filter:brightness(0.98)}
+
+.voice-status{margin-top:12px;font-size:13px;color:var(--muted);white-space:pre-line}
+.progress-summary{margin-top:12px;font-size:13px;color:var(--muted)}
+
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.04)}
+.muted{color:var(--muted);margin-top:6px}
+
+.items{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.item{border-radius:10px;padding:12px;background:linear-gradient(180deg,#ffffff,#f8fffb);display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(0,0,0,0.03)}
+.item .left{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.item .de{font-weight:800;font-size:18px;color:var(--accent)}
+.item .ar{color:var(--muted);font-size:14px}
+.item .controls{display:flex;gap:8px;align-items:center}
+
+.play-btn{background:var(--green);color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+.play-btn.small{padding:6px 8px;font-size:14px}
+.record-btn{background:#e86b4d;color:white;padding:8px;border-radius:8px;border:none;cursor:pointer}
+
+.completed-badge{background:#e6f8ef;color:#006b2f;padding:6px 8px;border-radius:8px;font-weight:700;font-size:13px}
+
+.nav-row{display:flex;justify-content:space-between;margin-top:16px;gap:12px}
+.lesson-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+.message{min-height:28px;color:var(--muted);padding:6px 4px}
+
+.footer{text-align:center;margin:28px 0;color:var(--muted);font-size:13px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;justify-content:center;align-items:center;z-index:60;visibility:hidden;opacity:0;transition:opacity .18s}
+.modal[aria-hidden="false"]{visibility:visible;opacity:1}
+.modal-content{background:white;padding:18px;border-radius:12px;min-width:320px;max-width:720px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+/* responsive */
+@media(max-width:900px){
+  .layout{flex-direction:column;padding:8px}
+  .sidebar{order:2;flex:unset;height:auto}
+  .content{order:1}
+}</style></head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📘</span>
+      <span class="title">HOMOS Learn — الألمانية حتى السفر</span>
+    </div>
+    <div class="right-actions">
+      <button id="exportBtn" class="btn ghost">تصدير التقدّم</button>
+      <button id="importBtn" class="btn ghost">استيراد تقدّم</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h3>المسارات</h3>
+      <div id="moduleList" class="module-list"></div>
+
+      <hr>
+
+      <h4>قائمة الدروس</h4>
+      <ul id="lessonList" class="lesson-list" aria-label="قائمة الدروس"></ul>
+
+      <div class="controls">
+        <button id="reviewWrongBtn" class="btn">مراجعة الأخطاء 🔁</button>
+        <button id="resetBtn" class="btn ghost">إعادة ضبط التقدّم ♻️</button>
+      </div>
+
+      <div class="voice-status" id="voiceStatus">جارِ التحضير للنطق...</div>
+      <div class="progress-summary" id="progressSummary">—</div>
+    </aside>
+
+    <section class="content">
+      <div id="lessonCard" class="card">
+        <h2 id="lessonTitle">اختر درساً من اليسار</h2>
+        <p id="lessonDesc" class="muted"></p>
+
+        <div id="itemsContainer" class="items"></div>
+
+        <div class="nav-row">
+          <button id="prevBtn" class="btn ghost">السابق ◀️</button>
+          <button id="playAllBtn" class="btn">تشغيل الدرس بالكامل 🔊</button>
+          <button id="nextBtn" class="btn">التالي ▶️</button>
+        </div>
+
+        <div class="lesson-actions">
+          <button id="markCompleteBtn" class="btn green">وضع علامة مكتمل ✅</button>
+          <button id="quizBtn" class="btn">اختبار الدرس ✍️</button>
+        </div>
+      </div>
+
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <!-- نافذة الاختبار -->
+  <div id="quizModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <h3 id="quizTitle">اختبار الدرس</h3>
+      <div id="quizArea"></div>
+      <div class="modal-actions">
+        <button id="closeQuiz" class="btn ghost">إغلاق</button>
+        <button id="startQuiz" class="btn green">ابدأ الاختبار</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- استيراد ملف -->
+  <input type="file" id="importFile" accept=".json" style="display:none">
+
+  <footer class="footer">
+    <small>نسخة محلية تجريبية — HOMOS Learn © 2025 — يعمل بالكامل داخل المتصفح</small>
+  </footer>
+
+  <script src="app.js"></script>
+
+<script type="text/javascript" id="dcoder_script">/* app.js
+   كورس محلي كامل (بدون سيرفر) — دروس، نطق آمن، اختبارات، حفظ تقدّم، مراجعة أخطاء.
+*/
+
+document.addEventListener("DOMContentLoaded", () => {
+  // عناصر DOM
+  const moduleListEl = document.getElementById("moduleList");
+  const lessonListEl = document.getElementById("lessonList");
+  const lessonTitleEl = document.getElementById("lessonTitle");
+  const lessonDescEl = document.getElementById("lessonDesc");
+  const itemsContainerEl = document.getElementById("itemsContainer");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const playAllBtn = document.getElementById("playAllBtn");
+  const markCompleteBtn = document.getElementById("markCompleteBtn");
+  const quizBtn = document.getElementById("quizBtn");
+  const reviewWrongBtn = document.getElementById("reviewWrongBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const voiceStatusEl = document.getElementById("voiceStatus");
+  const progressSummaryEl = document.getElementById("progressSummary");
+  const messageEl = document.getElementById("message");
+  const quizModal = document.getElementById("quizModal");
+  const quizArea = document.getElementById("quizArea");
+  const startQuizBtn = document.getElementById("startQuiz");
+  const closeQuizBtn = document.getElementById("closeQuiz");
+  const exportBtn = document.getElementById("exportBtn");
+  const importBtn = document.getElementById("importBtn");
+  const importFile = document.getElementById("importFile");
+
+  // بيانات المسارات والدروس (محلي)
+  // كل module يملك lessons، وكل درس يحتوي على items {de, ar, note?}
+  const modules = [
+    {
+      id: "basics",
+      title: "الأساسيات (A1)",
+      lessons: [
+        {
+          id: "pronouns",
+          title: "الضمائر الشخصية",
+          desc: "Ich, Du, Er, Sie, Wir, Ihr, Sie (صيغة الاحترام).",
+          items: [
+            { de: "Ich", ar: "أنا" },
+            { de: "Du", ar: "أنت (مفرد غير رسمي)" },
+            { de: "Er", ar: "هو" },
+            { de: "Sie", ar: "هي" },
+            { de: "Wir", ar: "نحن" },
+            { de: "Ihr", ar: "أنتم (غير رسمي)" },
+            { de: "Sie", ar: "حضرتك/هم (صيغة الاحترام)" }
+          ]
+        },
+        {
+          id: "basic-verbs",
+          title: "أفعال أساسية",
+          desc: "أفعال يومية بسيطة وصيغها الأساسية.",
+          items: [
+            { de: "sein", ar: "يكون / أكون" },
+            { de: "haben", ar: "يملك / لدي" },
+            { de: "gehen", ar: "يذهب" },
+            { de: "kommen", ar: "يأتي" },
+            { de: "sprechen", ar: "يتكلم" },
+            { de: "essen", ar: "يأكل" },
+            { de: "trinken", ar: "يشرب" }
+          ]
+        },
+        {
+          id: "greetings",
+          title: "التحيات والموارد اليومية",
+          desc: "عبارات تستخدم يوميًا (التحيات، الشكر، الاعتذارات).",
+          items: [
+            { de: "Guten Morgen", ar: "صباح الخير" },
+            { de: "Guten Abend", ar: "مساء الخير" },
+            { de: "Guten Tag", ar: "نهارك سعيد" },
+            { de: "Tschüss", ar: "مع السلامة (غير رسمي)" },
+            { de: "Auf Wiedersehen", ar: "إلى اللقاء (رسمي)" },
+            { de: "Danke", ar: "شكراً" },
+            { de: "Bitte", ar: "من فضلك / على الرحب والسعة" }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: "travel",
+      title: "حياة يومية و سفر",
+      lessons: [
+        {
+          id: "airport",
+          title: "في المطار",
+          desc: "عبارات أساسية في المطار: سؤال الاسم، الجواز، التذاكر.",
+          items: [
+            { de: "Wie heißen Sie?", ar: "ما اسمك؟ (رسمي)" },
+            { de: "Ich heiße ...", ar: "اسمي ..." },
+            { de: "Wo ist der Ausgang?", ar: "أين المخرج؟" },
+            { de: "Ich habe mein Ticket.", ar: "لدي تذكرتي." },
+            { de: "Darf ich Ihren Pass sehen?", ar: "هل أستطيع رؤية جوازك؟" }
+          ]
+        },
+        {
+          id: "hotel",
+          title: "الحجز في الفندق",
+          desc: "التواصل مع الاستقبال: حجز، تسجيل الوصول، طلب مفاتيح.",
+          items: [
+            { de: "Ich habe eine Reservierung.", ar: "لدي حجز." },
+            { de: "Ich möchte einchecken.", ar: "أريد تسجيل الدخول (check-in)." },
+            { de: "Können Sie mir das Passwort für WLAN geben?", ar: "هل يمكن أن تعطيني كلمة مرور الواي فاي؟" }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: "admin",
+      title: "الأوراق ودوائر حكومية",
+      lessons: [
+        {
+          id: "anmeldung",
+          title: "التسجيل في البلدية (Anmeldung)",
+          desc: "الكلمات الأساسية لتسجيل السكن.",
+          items: [
+            { de: "Meldebescheinigung", ar: "إثبات التسجيل" },
+            { de: "Wohnungsgeberbestätigung", ar: "تأكيد صاحب السكن" },
+            { de: "Ich möchte mich anmelden.", ar: "أريد التسجيل." }
+          ]
+        },
+        {
+          id: "bank",
+          title: "فتح حساب بنكي",
+          desc: "مصطلحات عند الذهاب للبنك.",
+          items: [
+            { de: "Ich möchte ein Konto eröffnen.", ar: "أريد فتح حساب." },
+            { de: "Kontostand", ar: "رصيد الحساب" },
+            { de: "EC-Karte", ar: "بطاقة بنكية" }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: "work",
+      title: "العمل والسيرة الذاتية",
+      lessons: [
+        {
+          id: "cv",
+          title: "كتابة سيرة ذاتية بسيطة",
+          desc: "عبارات تُستخدم في السيرة الذاتية ورسائل التقديم.",
+          items: [
+            { de: "Lebenslauf", ar: "السيرة الذاتية" },
+            { de: "Berufserfahrung", ar: "الخبرة العملية" },
+            { de: "Bewerbung", ar: "التقديم على وظيفة" }
+          ]
+        },
+        {
+          id: "interview",
+          title: "مقابلة العمل",
+          desc: "أسئلة وإجابات بسيطة للمقابلات.",
+          items: [
+            { de: "Warum möchten Sie hier arbeiten?", ar: "لماذا تريد العمل هنا؟" },
+            { de: "Ich habe Erfahrung in ...", ar: "لدي خبرة في ..." },
+            { de: "Wann können Sie anfangen?", ar: "متى تستطيع البدء؟" }
+          ]
+        }
+      ]
+    },
+
+    {
+      id: "health",
+      title: "الصحة والتأمين",
+      lessons: [
+        {
+          id: "doctor",
+          title: "زيارة الطبيب",
+          desc: "عبارات عند زيارة الطبيب أو الصيدلية.",
+          items: [
+            { de: "Ich habe Bauchschmerzen.", ar: "أعاني من ألم في البطن." },
+            { de: "Haben Sie Allergien?", ar: "هل لديك حساسية؟" },
+            { de: "Ich brauche einen Termin.", ar: "أحتاج لموعد." }
+          ]
+        }
+      ]
+    }
+  ];
+
+  // الحالة
+  let currentModuleIdx = 0;
+  let currentLessonIdx = 0;
+  let currentItemIdx = 0;
+  const STORAGE_KEY = "homos_learn_v2_progress";
+  let progress = loadProgress(); // { completed: {lessonId: true}, wrong: [], last: {moduleIdx, lessonIdx, itemIdx} }
+
+  // إعداد TTS: نبحث عن صوت ألماني متاح
+  let germanVoice = null;
+  function findGermanVoice() {
+    if (!("speechSynthesis" in window)) {
+      voiceStatusEl.textContent = "ميزة النطق غير مدعومة في هذا المتصفح.";
+      return;
+    }
+    const voices = speechSynthesis.getVoices();
+    germanVoice = voices.find(v => (v.lang && v.lang.toLowerCase().startsWith("de")) || (v.name && /german/i.test(v.name)));
+    if (germanVoice) voiceStatusEl.textContent = `صوت ألماني جاهز: ${germanVoice.name}`;
+    else voiceStatusEl.textContent = "لا يوجد صوت ألماني مخصّص؛ سيُستخدم صوت المتصفح الافتراضي.";
+  }
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = findGermanVoice;
+    // محاولة البدء بعد قليل
+    setTimeout(findGermanVoice, 300);
+  } else {
+    voiceStatusEl.textContent = "النطق غير مدعوم (SpeechSynthesis غير موجود).";
+  }
+
+  // دوال التخزين
+  function loadProgress() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { completed: {}, wrong: [], last: {moduleIdx:0, lessonIdx:0, itemIdx:0} };
+      return JSON.parse(raw);
+    } catch (e) {
+      console.warn("loadProgress error", e);
+      return { completed: {}, wrong: [], last: {moduleIdx:0, lessonIdx:0, itemIdx:0} };
+    }
+  }
+  function saveProgress() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      updateProgressUI();
+    } catch (e) {
+      console.warn("saveProgress error", e);
+    }
+  }
+  function resetProgress() {
+    if (!confirm("هل تريد إعادة ضبط كل التقدّم؟")) return;
+    progress = { completed: {}, wrong: [], last: {moduleIdx:0, lessonIdx:0, itemIdx:0} };
+    currentModuleIdx = 0; currentLessonIdx = 0; currentItemIdx = 0;
+    saveProgress();
+    renderAll();
+    showMessage("تمت إعادة ضبط التقدّم.");
+  }
+
+  // تصدير واستيراد
+  exportBtn.addEventListener("click", () => {
+    const dataStr = JSON.stringify(progress, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "homos_learn_progress.json"; document.body.appendChild(a); a.click();
+    a.remove(); URL.revokeObjectURL(url);
+  });
+  importBtn.addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        if (obj && typeof obj === "object") {
+          progress = obj;
+          saveProgress();
+          renderAll();
+          showMessage("تم استيراد التقدّم بنجاح.");
+        } else throw new Error("تنسيق غير صحيح");
+      } catch (err) {
+        alert("فشل استيراد الملف: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    importFile.value = "";
+  });
+
+  // واجهة: عرض المسارات
+  function renderModuleList() {
+    moduleListEl.innerHTML = "";
+    modules.forEach((m, mi) => {
+      const div = document.createElement("div");
+      div.className = "module-item" + (mi === currentModuleIdx ? " active" : "");
+      div.innerHTML = `<div style="text-align:right"><strong>${m.title}</strong><div class="muted" style="font-size:13px">${m.lessons.length} درس</div></div>`;
+      div.addEventListener("click", () => {
+        currentModuleIdx = mi; currentLessonIdx = 0; currentItemIdx = 0;
+        progress.last = { moduleIdx: currentModuleIdx, lessonIdx: currentLessonIdx, itemIdx: currentItemIdx };
+        saveProgress();
+        renderAll();
+      });
+      moduleListEl.appendChild(div);
+    });
+  }
+
+  // عرض قائمة الدروس للموديول الحالي
+  function renderLessonList() {
+    lessonListEl.innerHTML = "";
+    const lessons = modules[currentModuleIdx].lessons;
+    lessons.forEach((ls, li) => {
+      const liEl = document.createElement("li");
+      liEl.className = (li === currentLessonIdx ? "active" : "");
+      liEl.innerHTML = `<div style="text-align:right"><div class="title-small">${ls.title}</div><div class="meta">${ls.desc}</div></div>
+                        <div>${progress.completed[ls.id] ? '<span class="completed-badge">مكتمل</span>' : ''}</div>`;
+      liEl.addEventListener("click", () => {
+        currentLessonIdx = li; currentItemIdx = 0;
+        progress.last = { moduleIdx: currentModuleIdx, lessonIdx: currentLessonIdx, itemIdx: currentItemIdx };
+        saveProgress();
+        renderAll();
+      });
+      lessonListEl.appendChild(liEl);
+    });
+  }
+
+  // عرض محتوى الدرس
+  function renderLessonContent() {
+    const lesson = modules[currentModuleIdx].lessons[currentLessonIdx];
+    lessonTitleEl.textContent = lesson.title;
+    lessonDescEl.textContent = lesson.desc;
+    itemsContainerEl.innerHTML = "";
+
+    lesson.items.forEach((it, ii) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "item";
+      itemDiv.innerHTML = `
+        <div class="left">
+          <div class="de">${it.de}</div>
+          <div class="ar">${it.ar}</div>
+        </div>
+        <div class="controls">
+          <button class="play-btn small" data-idx="${ii}">🔊 نطق</button>
+          <button class="play-btn small record-btn" data-idx="${ii}">🎤 جرّب نطقك</button>
+        </div>
+      `;
+      // أحداث الأزرار
+      const playBtn = itemDiv.querySelector(".play-btn");
+      playBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        speakText(it.de);
+      });
+      const recordBtn = itemDiv.querySelector(".record-btn");
+      recordBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        recordPlaybackExample(it.de);
+      });
+
+      itemsContainerEl.appendChild(itemDiv);
+    });
+
+    // ضبط أزرار التنقل
+    prevBtn.disabled = currentLessonIdx === 0;
+    nextBtn.disabled = currentLessonIdx === modules[currentModuleIdx].lessons.length - 1;
+
+    // حالة الدرس مكتمل
+    markCompleteBtn.textContent = progress.completed[lesson.id] ? "مكتمل ✅" : "وضع علامة مكتمل ✅";
+    updateProgressUI();
+  }
+
+  // نطق آمن
+  function speakText(text) {
+    if (!("speechSynthesis" in window)) {
+      showMessage("النطق غير مدعوم في متصفحك. استخدم Chrome أو Firefox.", 3000);
+      return;
+    }
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "de-DE";
+      u.rate = 0.95;
+      if (germanVoice) u.voice = germanVoice;
+      speechSynthesis.speak(u);
+    } catch (e) {
+      console.error("speakText error", e);
+      showMessage("تعذر تشغيل النطق.", 2000);
+    }
+  }
+
+  // تشغيل كل عناصر الدرس بالتتابع
+  playAllBtn.addEventListener("click", async () => {
+    const lesson = modules[currentModuleIdx].lessons[currentLessonIdx];
+    for (let it of lesson.items) {
+      speakText(it.de);
+      // ننتظر 900-1200 ملّي ثانية بين الكلمات
+      await new Promise(r => setTimeout(r, 900));
+    }
+  });
+
+  // تسجيل صوتي مؤقت وتشغيله
+  async function recordPlaybackExample(expectedText) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showMessage("التسجيل غير مدعوم على هذا المتصفح/الجهاز.", 3000);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream);
+      const chunks = [];
+      showMessage("التسجيل يبدأ الآن — تحدث الكلمة أو الجملة بصوت واضح (2.5 ثانية) ...", 3000);
+      mr.ondataavailable = e => chunks.push(e.data);
+      mr.onstop = () => {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = url;
+        audio.style.marginTop = "8px";
+        messageEl.innerHTML = `استمع لتسجيلك: <br>`;
+        messageEl.appendChild(audio);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mr.start();
+      setTimeout(() => { if (mr.state !== "inactive") mr.stop(); }, 2500);
+    } catch (err) {
+      console.error(err);
+      showMessage("تعذر الوصول إلى الميكروفون أو رفضت الإذن.", 3000);
+    }
+  }
+
+  // وسم الدرس كمكتمل
+  markCompleteBtn.addEventListener("click", () => {
+    const lesson = modules[currentModuleIdx].lessons[currentLessonIdx];
+    progress.completed[lesson.id] = true;
+    progress.last = { moduleIdx: currentModuleIdx, lessonIdx: currentLessonIdx, itemIdx: currentItemIdx };
+    saveProgress();
+    renderAll();
+    showMessage("تم وضع علامة إتمام على الدرس ✅", 2000);
+  });
+
+  // مراجعة الأخطاء (spaced repetition بسيطة)
+  reviewWrongBtn.addEventListener("click", () => {
+    if (!progress.wrong || progress.wrong.length === 0) {
+      alert("لا توجد كلمات خاطئة الآن — حسّن محاولاتك وسيُسجل الخطأ للمراجعة.");
+      return;
+    }
+    // نعرض نافذة اختبار مخصّصة للكلمات الخاطئة
+    openQuizModal(true);
+  });
+
+  // زر إعادة الضبط
+  resetBtn.addEventListener("click", resetProgress);
+
+  // التنقل بين الدروس
+  prevBtn.addEventListener("click", () => {
+    if (currentLessonIdx > 0) currentLessonIdx--;
+    progress.last = { moduleIdx: currentModuleIdx, lessonIdx: currentLessonIdx, itemIdx: 0 };
+    saveProgress();
+    renderAll();
+  });
+  nextBtn.addEventListener("click", () => {
+    if (currentLessonIdx < modules[currentModuleIdx].lessons.length - 1) currentLessonIdx++;
+    progress.last = { moduleIdx: currentModuleIdx, lessonIdx: currentLessonIdx, itemIdx: 0 };
+    saveProgress();
+    renderAll();
+  });
+
+  // فتح نافذة الاختبار
+  quizBtn.addEventListener("click", () => openQuizModal(false));
+  function openQuizModal(onlyWrong = false) {
+    quizModal.setAttribute("aria-hidden", "false");
+    quizArea.innerHTML = "";
+    if (onlyWrong) {
+      quizArea.innerHTML = `<p class="muted">اختبار كلمات خاطئة (${progress.wrong.length})</p><div id="quizContainerWrong"></div>`;
+      buildQuizFromWrong();
+    } else {
+      quizArea.innerHTML = `<p class="muted">اختبار الدرس الحالي</p><div id="quizContainer"></div>`;
+      buildQuizForCurrentLesson();
+    }
+  }
+  closeQuizBtn.addEventListener("click", () => { quizModal.setAttribute("aria-hidden", "true"); quizArea.innerHTML = ""; });
+  startQuizBtn && startQuizBtn.addEventListener("click", () => {
+    // لا حاجة هنا لأن البنية تبنى فور الفتح
+  });
+
+  // بناء اختبار للدرس الحالي
+  function buildQuizForCurrentLesson() {
+    const lesson = modules[currentModuleIdx].lessons[currentLessonIdx];
+    const container = document.getElementById("quizContainer");
+    container.innerHTML = "";
+    // نولد 5 أسئلة أو أقل بناء على حجم الدرس
+    const pool = [...lesson.items];
+    shuffle(pool);
+    const qCount = Math.min(5, pool.length);
+    for (let i = 0; i < qCount; i++) {
+      const item = pool[i];
+      const qDiv = document.createElement("div");
+      qDiv.className = "quiz-q";
+      const options = [item.ar];
+      // نأخذ 3 مشتتات من بقية العناصر
+      const distractors = lesson.items.filter(x => x.ar !== item.ar).slice(0);
+      shuffle(distractors);
+      for (let j = 0; j < Math.min(3, distractors.length); j++) options.push(distractors[j].ar);
+      shuffle(options);
+      qDiv.innerHTML = `<div style="text-align:right;margin-bottom:6px"><strong>ما معنى:</strong> <span style="font-weight:800">${item.de}</span></div>`;
+      options.forEach(opt => {
+        const b = document.createElement("button");
+        b.className = "btn ghost";
+        b.textContent = opt;
+        b.addEventListener("click", () => {
+          if (opt === item.ar) {
+            b.style.background = "#e6f8ef"; b.style.border = "1px solid #bfe6c9";
+            showMessage("إجابة صحيحة ✓", 1200);
+          } else {
+            b.style.background = "#ffe6e6";
+            // سجل الخطأ
+            if (!progress.wrong.includes(item.de)) progress.wrong.push(item.de);
+            saveProgress();
+            showMessage(`خطأ — الإجابة الصحيحة: ${item.ar}`, 1800);
+          }
+        });
+        qDiv.appendChild(b);
+      });
+      container.appendChild(qDiv);
+    }
+  }
+
+  // بناء اختبار من الكلمات الخاطئة
+  function buildQuizFromWrong() {
+    const container = document.getElementById("quizContainerWrong");
+    container.innerHTML = "";
+    if (!progress.wrong || progress.wrong.length === 0) { container.innerHTML = "<p>لا توجد كلمات خاطئة.</p>"; return; }
+    const pool = [...progress.wrong];
+    shuffle(pool);
+    pool.slice(0, Math.min(8, pool.length)).forEach(deWord => {
+      // نبحث عن الترجمة داخل modules
+      const found = findItemByDE(deWord);
+      const ar = found ? found.ar : "(تعذر العثور على الترجمة)";
+      const qDiv = document.createElement("div");
+      qDiv.className = "quiz-q";
+      qDiv.innerHTML = `<div style="text-align:right;margin-bottom:6px"><strong>ما معنى:</strong> <span style="font-weight:800">${deWord}</span></div>
+                        <div style="margin-bottom:8px"><em>${ar}</em></div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end">
+                          <button class="btn" onclick="removeWrong('${escapeForAttr(deWord)}')">أزل من المراجعة</button>
+                        </div>`;
+      container.appendChild(qDiv);
+    });
+  }
+
+  // إزالة كلمة من قائمة الأخطاء
+  window.removeWrong = function(deWordEscaped) {
+    const deWord = deWordEscaped;
+    progress.wrong = progress.wrong.filter(w => w !== deWord);
+    saveProgress();
+    buildQuizFromWrong();
+    showMessage("أزيلت الكلمة من قائمة الأخطاء.", 1500);
+  };
+
+  // مساعدة: البحث عن ترجمة حسب كلمة ألمانية
+  function findItemByDE(de) {
+    for (let m of modules) {
+      for (let l of m.lessons) {
+        for (let it of l.items) {
+          if (it.de === de) return it;
+        }
+      }
+    }
+    return null;
+  }
+
+  // تسجيل الأخطاء عند الإجابة الخاطئة في أي اختبار آخر
+  function addWrong(de) {
+    if (!progress.wrong.includes(de)) {
+      progress.wrong.push(de);
+      saveProgress();
+    }
+  }
+
+  // مساعدات
+  function showMessage(txt, timeout = 0) {
+    messageEl.textContent = txt;
+    if (timeout > 0) setTimeout(() => { if (messageEl.textContent === txt) messageEl.textContent = ""; }, timeout);
+  }
+
+  function updateProgressUI() {
+    const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
+    const completedCount = Object.keys(progress.completed || {}).length;
+    progressSummaryEl.textContent = `الدروس المكتملة: ${completedCount} / ${totalLessons} — كلمات للمراجعة: ${progress.wrong.length}`;
+    // إعادة رسم قائمة الدروس لعرض badge
+    renderLessonList();
+  }
+
+  // مساعدة: خلط
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // وظائف عرض كاملة
+  function renderAll() {
+    renderModuleList();
+    renderLessonList();
+    renderLessonContent();
+  }
+
+  // تشغيل البداية: استعادة آخر حالة
+  if (progress && progress.last) {
+    currentModuleIdx = progress.last.moduleIdx || 0;
+    currentLessonIdx = progress.last.lessonIdx || 0;
+    currentItemIdx = progress.last.itemIdx || 0;
+  }
+  renderAll();
+
+  // حفظ تلقائي قبل الخروج
+  window.addEventListener("beforeunload", () => saveProgress());
+
+  // تهيئة أزرار الاختبار داخل المودال
+  // عند فتح المودال بالفعل، يتم بناء المحتوى؛ لذلك startQuizBtn غير مطلوب هنا.
+  // أغلق المودال عند النقر خارج المحتوى
+  quizModal.addEventListener("click", (e) => {
+    if (e.target === quizModal) {
+      quizModal.setAttribute("aria-hidden", "true");
+      quizArea.innerHTML = "";
+    }
+  });
+
+  // انقر على زر بناء الاختبار فور فتح المودال (هناك زر startQuiz لكنه غير ضروري)
+  // لكن نحتاج ربط closeQuizBtn و startQuizBtn إن وُجدت
+  if (closeQuizBtn) closeQuizBtn.addEventListener("click", () => { quizModal.setAttribute("aria-hidden", "true"); quizArea.innerHTML = ""; });
+
+  // حفظ التقدّم على الفور
+  saveProgress();
+
+  // >>> إنهاء التعريفات الرئيسية <<<
+
+  // ملاحظة: لا نستدعي speechSynthesis مباشرة دون تحقق؛ استخدم speakText() الآمنة.
+
+});</script></body></html>
